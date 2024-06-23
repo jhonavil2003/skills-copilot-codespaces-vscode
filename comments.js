@@ -1,19 +1,22 @@
-// Create a web server
-// Create a web server that listens on port 3000 and serves comments.json as a JSON response when a GET request is made to /comments.
-// Make sure to use the right content-type.
+// Create web server
+// 1. Create a web server
+// 2. Handle GET requests for /comments
+// 3. Send back a response with some comments
+// 4. Listen on port 3000
 
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
 
-http.createServer(function (req, res) {
-  if (req.url === '/comments' && req.method === 'GET') {
-    res.writeHead(200, {
-      'Content-Type': 'application/json'
-    });
-    fs.createReadStream(__dirname + '/comments.json').pipe(res);
-  } else {
-    res.writeHead(404);
-    res.end();
-  }
-}).listen(3000);
-console.log('Server running at http://localhost:3000/');
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ comments: ['one', 'two', 'three'] }));
+});
+
+server.listen(3000, () => {
+  console.log('Server is listening on port 3000');
+});
+
+
+
+
+
+
