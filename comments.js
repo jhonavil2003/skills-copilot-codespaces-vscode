@@ -1,38 +1,19 @@
 // Create a web server
-const http = require('http');
-const fs = require('fs');
-const url = require('url');
-const port = 3000;
+// Create a web server that listens on port 3000 and serves comments.json as a JSON response when a GET request is made to /comments.
+// Make sure to use the right content-type.
 
-// Create a server
-const server = http.createServer((req, res) => {
-  const path = url.parse(req.url).pathname;
-  console.log(path);
-  // Serve the index.html file
-  if (path === '/' || path === '/index.html') {
-    fs.readFile(__dirname + '/index.html', (err, data) => {
-      if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.write('Oh no! Error 404: Not found!');
-        res.end();
-      } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write(data);
-        res.end();
-      }
+var http = require('http');
+var fs = require('fs');
+
+http.createServer(function (req, res) {
+  if (req.url === '/comments' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json'
     });
-  } else if (path === '/comments') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('Comments page');
-    res.end();
+    fs.createReadStream(__dirname + '/comments.json').pipe(res);
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.write('Oh no! Error 404: Not found!');
+    res.writeHead(404);
     res.end();
   }
-});
-
-// Start the server
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
+}).listen(3000);
+console.log('Server running at http://localhost:3000/');
