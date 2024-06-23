@@ -1,45 +1,38 @@
 // Create a web server
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
+const port = 3000;
 
-// Use the body-parser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-// Serve the index.html file
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
-});
-
-// Serve the comments.json file
-app.get('/comments.json', function(req, res) {
-    res.sendFile(__dirname + '/comments.json');
-});
-
-// Handle POST requests to add comments
-app.post('/add_comment', function(req, res) {
-    fs.readFile(__dirname + '/comments.json', function(err, data) {
-        if (err) {
-            console.error(err);
-            process.exit(1);
-        }
-
-        var comments = JSON.parse(data);
-        comments.push(req.body.comment);
-
-        fs.writeFile(__dirname + '/comments.json', JSON.stringify(comments, null, 4), function(err) {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-        });
+// Create a server
+const server = http.createServer((req, res) => {
+  const path = url.parse(req.url).pathname;
+  console.log(path);
+  // Serve the index.html file
+  if (path === '/' || path === '/index.html') {
+    fs.readFile(__dirname + '/index.html', (err, data) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.write('Oh no! Error 404: Not found!');
+        res.end();
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.write(data);
+        res.end();
+      }
     });
+  } else if (path === '/comments') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('Comments page');
     res.end();
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.write('Oh no! Error 404: Not found!');
+    res.end();
+  }
 });
 
-// Start the server on port 3000
-app.listen(3000, function() {
-    console.log('Server started on http://localhost:3000/');
+// Start the server
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
